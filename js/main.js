@@ -8,15 +8,50 @@ function preload() {
 class Vehicle {
 
     constructor(x, y) {
-        this.pos = createVector(x, y);
+        this.pos = createVector(random(width), random(height));
         this.target = createVector(x, y);
-        this.vel = createVector();
+        this.vel = p5.Vector.random2D();
         this.acc = createVector();
+        this.maxSpeed = 5;
+        this.maxForce = 0.3;
+    }
+
+    behaviors() {
+        // let seek = this.seek(this.target);
+        // this.applyForce(seek);
+        let arrive = this.arrive(this.target);
+        this.applyForce(arrive);
+    }
+
+    applyForce(force) {
+        this.acc.add(force);
     }
 
     update() {
         this.pos.add(this.vel);
         this.vel.add(this.acc);
+        this.acc.mult(0); // clear acceleration
+    }
+
+    arrive(target) {
+        let desired = p5.Vector.sub(target, this.pos);
+        let dist = desired.mag();
+        let speed = this.maxSpeed;
+        if (dist < 100) {
+            speed = map(dist, 0, 100, 0, this.maxSpeed);
+        }
+        desired.setMag(speed);
+        let steer = p5.Vector.sub(desired, this.vel);
+        steer.limit(this.maxForce);
+        return steer;
+    }
+
+    seek(target) {
+        let desired = p5.Vector.sub(target, this.pos);
+        desired.setMag(this.maxSpeed);
+        let steer = p5.Vector.sub(desired, this.vel);
+        steer.limit(this.maxForce);
+        return steer;
     }
 
     show() {
@@ -53,6 +88,7 @@ function draw() {
     background(0);
     for (let i = 0; i < vehicles.length; i++) {
         let vehicle = vehicles[i];
+        vehicle.behaviors();
         vehicle.update();
         vehicle.show();
     }
