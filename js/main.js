@@ -21,10 +21,14 @@ class Vehicle {
         // this.applyForce(seek);
 
         let arrive = this.arrive(this.target);
-        this.applyForce(arrive);
-
         let mouse = createVector(mouseX, mouseY);
         let flee = this.flee(mouse);
+        
+        // make flee force stronger than arrvive
+        arrive.mult(1);
+        flee.mult(5);
+
+        this.applyForce(arrive);
         this.applyForce(flee);
 
     }
@@ -43,6 +47,7 @@ class Vehicle {
         let desired = p5.Vector.sub(target, this.pos);
         let dist = desired.mag();
         let speed = this.maxSpeed;
+        // move vehicle slower until full stop if it is closer to its target
         if (dist < 100) {
             speed = map(dist, 0, 100, 0, this.maxSpeed);
         }
@@ -55,6 +60,7 @@ class Vehicle {
     flee(target) {
         let desired = p5.Vector.sub(target, this.pos);
         let dist = desired.mag();
+        // apply only when hostile agent is closer than 50px
         if (dist < 50) {
             desired.setMag(this.maxSpeed);
             desired.mult(-1);
