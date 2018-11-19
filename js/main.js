@@ -19,8 +19,14 @@ class Vehicle {
     behaviors() {
         // let seek = this.seek(this.target);
         // this.applyForce(seek);
+
         let arrive = this.arrive(this.target);
         this.applyForce(arrive);
+
+        let mouse = createVector(mouseX, mouseY);
+        let flee = this.flee(mouse);
+        this.applyForce(flee);
+
     }
 
     applyForce(force) {
@@ -46,6 +52,20 @@ class Vehicle {
         return steer;
     }
 
+    flee(target) {
+        let desired = p5.Vector.sub(target, this.pos);
+        let dist = desired.mag();
+        if (dist < 50) {
+            desired.setMag(this.maxSpeed);
+            desired.mult(-1);
+            let steer = p5.Vector.sub(desired, this.vel);
+            steer.limit(this.maxForce);
+            return steer;
+        } else {
+            return createVector(0, 0);
+        }
+    }
+    
     seek(target) {
         let desired = p5.Vector.sub(target, this.pos);
         desired.setMag(this.maxSpeed);
